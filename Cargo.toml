@@ -1,0 +1,13 @@
+[package]
+name = "tulpa"
+version = "0.1.0"
+authors = ["Charlie Cummings <chc4000@gmail.com>"]
+
+[build-dependencies]
+lalrpop = "0.16.0"
+
+[dependencies]
+lalrpop-util = "0.16.0"
+regex = "0.2.1"
+luther = "0.1"
+luther-derive = "0.1"

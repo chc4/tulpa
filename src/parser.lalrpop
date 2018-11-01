@@ -1,0 +1,85 @@
+use std::str::FromStr;
+use std::error::Error;
+use crate::parsing::{Ast,Token};
+use luther::{LexError,Location};
+use luther::spanned::Never;
+use std::result::Result;
+
+grammar;
+
+use crate::Token::Gap as Gap;
+
+pub Top: Ast = {
+    Gap? <Expr> Gap?
+}
+
+pub Expr: Ast = {
+    <If>,
+    <Let>,
+    <Statement>,
+}
+
+pub Statement: Ast = {
+    Pel Gap? <Expr> Gap? Per,
+    <Core>,
+    <Str>,
+    <Num>,
+    <Var>
+}
+
+pub Core: Ast = {
+    Sel Gap <first:(<Ident> Gap? Tis Gap? <Expr>)> <arms:(Gap <Ident> Gap? Tis Gap? <Expr>)*> Gap Ser => {
+        let mut arms = arms;
+        let mut all_arms = vec![first];
+        all_arms.append(&mut arms);
+        Ast::Core(all_arms)
+    }
+}
+
+pub If: Ast = {
+    // braces? backstep?
+    _If Gap? <cond:Statement> Gap? <if_true:Expr> Gap? <if_false:Expr> => {
+        Ast::If(Box::new(cond), Box::new(if_true), Box::new(if_false))
+    }
+}
+
+Let: Ast = {
+    // TODO destructuring? faces instead?
+    _Let Gap? <bind:Ident> Gap? Tis Gap? <val:Expr> Gap? <cont:Expr> => {
+        Ast::Let(bind.to_string(), Box::new(val), Box::new(cont))
+    }
+}
+
+Var: Ast = {
+    <_Ident> => Ast::Var(<>)
+}
+
+Str: Ast = {
+    // TODO: escape sequences, interpolation
+    <chars:_Str> => Ast::Str(chars.to_string())
+}
+
+Num: Ast = <s:_Num> => Ast::Num(i32::from_str(&s).unwrap());
+
+Ident: String = <_Str> => <>.to_string();
+
+extern {
+    type Location = Location;
+    type Error = LexError<Never>; //Box<Error>;
+
+    enum Token {
+        Function => Token::Function,
+        _If => Token::If,
+        _Let => Token::Let,
+        Tis => Token::Tis,
+        Pel => Token::Pel,
+        Per => Token::Per,
+        Sel => Token::Sel,
+        Ser => Token::Ser,
+        Comment => Token::Comment,
+        Gap => Token::Gap,
+        _Num => Token::Num(<String>),
+        _Ident => Token::Ident(<String>),
+        _Str => Token::Str(<String>),
+    }
+}

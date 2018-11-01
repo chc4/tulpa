@@ -1,0 +1,6 @@
+tulpa - make imaginary friends
+
+i wrote a thing about how Lua is just Hoon but with by-reference and mutable variables
+i really liked that framing.
+i've wanted to make "hoon but different" for a while, so instead of using its weird
+syntax use lua-ish syntax
