@@ -61,7 +61,7 @@ Str: Ast = {
 
 Num: Ast = <s:_Num> => Ast::Num(i32::from_str(&s).unwrap());
 
-Ident: String = <_Str> => <>.to_string();
+Ident: String = <_Ident> => <>.to_string();
 
 extern {
     type Location = Location;
