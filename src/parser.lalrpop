@@ -16,6 +16,7 @@ pub Top: Ast = {
 pub Expr: Ast = {
     <If>,
     <Let>,
+    <Within>,
     <Statement>,
 }
 
@@ -27,8 +28,17 @@ pub Statement: Ast = {
     <Var>
 }
 
+pub Within: Ast = {
+    _Do Gap <statement:Expr> Gap _In Gap <context:Expr> => {
+        Ast::Within(Box::new(statement), Box::new(context))
+    },
+    _In Gap <context:Expr> Gap _Do Gap <statement:Expr> => {
+        Ast::Within(Box::new(statement), Box::new(context))
+    }
+}
+
 pub Core: Ast = {
-    Sel Gap <first:(<Ident> Gap? Tis Gap? <Expr>)> <arms:(Gap <Ident> Gap? Tis Gap? <Expr>)*> Gap Ser => {
+    Sel Gap? <first:(<Ident> Gap? Tis Gap? <Expr>)> <arms:(Gap <Ident> Gap? Tis Gap? <Expr>)*> Gap? Ser => {
         let mut arms = arms;
         let mut all_arms = vec![first];
         all_arms.append(&mut arms);
@@ -56,7 +66,10 @@ Var: Ast = {
 
 Str: Ast = {
     // TODO: escape sequences, interpolation
-    <chars:_Str> => Ast::Str(chars.to_string())
+    <chars:_Str> => {
+        let mut chars = chars;
+        Ast::Str(chars[1..chars.len()-1].to_string())
+    }
 }
 
 Num: Ast = <s:_Num> => Ast::Num(i32::from_str(&s).unwrap());
@@ -71,6 +84,8 @@ extern {
         Function => Token::Function,
         _If => Token::If,
         _Let => Token::Let,
+        _Do => Token::Do,
+        _In => Token::In,
         Tis => Token::Tis,
         Pel => Token::Pel,
         Per => Token::Per,
