@@ -1,6 +1,11 @@
 tulpa - make imaginary friends
 
 i wrote a thing about how Lua is just Hoon but with by-reference and mutable variables
-i really liked that framing.
+i really like this framing
 i've wanted to make "hoon but different" for a while, so instead of using its weird
 syntax use lua-ish syntax
+
+- purely functional
+- first-class contexts (getfenv(0), basically, with no upvalues/locals)
+- statically strongly typed
+- functions are objects are cores - balls of state with computed properties, closed over an environment. arguments are implemented as variables closed over and set before computing the "body" property.
